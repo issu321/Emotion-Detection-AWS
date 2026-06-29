@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+
+{% block title %}Login - EmoVoice{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-page::before {
+        content: '';
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.08), transparent 70%);
+        top: -200px;
+        left: -200px;
+        animation: orbFloat 20s ease-in-out infinite;
+    }
+
+    .auth-page::after {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.06), transparent 70%);
+        bottom: -150px;
+        right: -150px;
+        animation: orbFloat 25s ease-in-out infinite reverse;
+    }
+
+    @keyframes orbFloat {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -30px) scale(1.05); }
+        66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    .auth-container {
+        width: 100%;
+        max-width: 460px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-card {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 2rem;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 25px 50px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .auth-card:hover {
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(99, 102, 241, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        border-color: rgba(99, 102, 241, 0.15);
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0.8;
+    }
+
+    .auth-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, transparent 50%);
+        animation: cardGlow 10s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes cardGlow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-header .logo-icon {
+        width: 75px;
+        height: 75px;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 1.75rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        animation: iconPulse 3s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-header .logo-icon::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        border-radius: 1.5rem;
+        z-index: -1;
+        filter: blur(8px);
+        opacity: 0.5;
+        animation: iconGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    @keyframes iconGlow {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+    }
+
+    .auth-header h2 {
+        font-size: 1.875rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .auth-header p {
+        color: var(--gray);
+        font-size: 0.925rem;
+    }
+
+    .auth-form {
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 1.125rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .input-wrapper .form-input {
+        padding-left: 3rem;
+        padding-right: 1rem;
+    }
+
+    .input-wrapper .form-input:focus + i,
+    .input-wrapper .form-input:not(:placeholder-shown) + i {
+        color: var(--primary);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--glass-border);
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-footer p {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .auth-footer a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: width 0.3s ease;
+    }
+
+    .auth-footer a:hover::after {
+        width: 100%;
+    }
+
+    .btn-full {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1.05rem;
+    }
+
+    .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--gray);
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .remember-me input {
+        accent-color: var(--primary);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .forgot-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .forgot-link::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: width 0.3s ease;
+    }
+
+    .forgot-link:hover::after {
+        width: 100%;
+    }
+
+    .social-login {
+        margin-top: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .social-login p {
+        text-align: center;
+        color: var(--gray);
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .social-login p::before,
+    .social-login p::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 28%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+    }
+
+    .social-login p::before { left: 0; }
+    .social-login p::after { right: 0; }
+
+    .social-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid var(--glass-border);
+        border-radius: 0.875rem;
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--light);
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .social-btn:hover {
+        border-color: rgba(99, 102, 241, 0.3);
+        background: rgba(99, 102, 241, 0.08);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+    }
+
+    .social-btn i {
+        font-size: 1.1rem;
+    }
+
+    /* Shake animation for error */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .shake {
+        animation: shake 0.5s ease-in-out;
+    }
+
+    /* Input focus glow */
+    .input-glow {
+        position: absolute;
+        inset: -2px;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+        filter: blur(8px);
+    }
+
+    .input-wrapper:focus-within .input-glow {
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<center>
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card reveal-scale">
+            <div class="auth-header">
+                <div class="logo-icon">
+                    <i class="fas fa-wave-square"></i>
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Sign in to access your emotion dashboard</p>
+            </div>
+
+            <form class="auth-form" method="POST" action="{{ url_for('login') }}" id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" name="username" class="form-input" placeholder="Enter your username" required autocomplete="username">
+                        <i class="fas fa-user"></i>
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+                        <i class="fas fa-lock"></i>
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox" checked>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full btn-glow" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span id="btn-text">Sign In</span>
+                </button>
+            </form>
+
+            <div class="social-login">
+                <p>Or continue with</p>
+                <div class="social-buttons">
+                    <button class="social-btn" type="button">
+                        <i class="fab fa-google"></i>
+                        Google
+                    </button>
+                    <button class="social-btn" type="button">
+                        <i class="fab fa-github"></i>
+                        GitHub
+                    </button>
+                </div>
+            </div>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Create one</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+</center>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Form submission animation
+    const loginForm = document.getElementById('login-form');
+    const loginBtn = document.getElementById('login-btn');
+    const btnText = document.getElementById('btn-text');
+
+    loginForm.addEventListener('submit', function(e) {
+        btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+        loginBtn.style.opacity = '0.8';
+        loginBtn.style.pointerEvents = 'none';
+    });
+
+    // Input focus effects
+    document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.01)';
+        });
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+</script>
+{% endblock %}

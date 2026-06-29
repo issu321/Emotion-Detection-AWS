@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}Register - EmoVoice{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-page::before {
+        content: '';
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.08), transparent 70%);
+        top: -200px;
+        right: -200px;
+        animation: orbFloat 22s ease-in-out infinite;
+    }
+
+    .auth-page::after {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.06), transparent 70%);
+        bottom: -150px;
+        left: -150px;
+        animation: orbFloat 18s ease-in-out infinite reverse;
+    }
+
+    @keyframes orbFloat {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(-30px, -20px) scale(1.05); }
+        66% { transform: translate(20px, 30px) scale(0.95); }
+    }
+
+    .auth-container {
+        width: 100%;
+        max-width: 480px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-card {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 2rem;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 25px 50px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .auth-card:hover {
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(99, 102, 241, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        border-color: rgba(99, 102, 241, 0.15);
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--secondary), var(--primary), var(--accent));
+        opacity: 0.8;
+    }
+
+    .auth-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.03) 0%, transparent 50%);
+        animation: cardGlow 12s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes cardGlow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-header .logo-icon {
+        width: 75px;
+        height: 75px;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 1.75rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3);
+        animation: iconPulse 3s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-header .logo-icon::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        background: linear-gradient(135deg, var(--secondary), var(--primary), var(--accent));
+        border-radius: 1.5rem;
+        z-index: -1;
+        filter: blur(8px);
+        opacity: 0.5;
+        animation: iconGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    @keyframes iconGlow {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+    }
+
+    .auth-header h2 {
+        font-size: 1.875rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #fff, var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .auth-header p {
+        color: var(--gray);
+        font-size: 0.925rem;
+    }
+
+    .auth-form {
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 1.125rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .input-wrapper .form-input {
+        padding-left: 3rem;
+        padding-right: 1rem;
+    }
+
+    .input-wrapper .form-input:focus + i,
+    .input-wrapper .form-input:not(:placeholder-shown) + i {
+        color: var(--primary);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--glass-border);
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-footer p {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .auth-footer a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transition: width 0.3s ease;
+    }
+
+    .auth-footer a:hover::after {
+        width: 100%;
+    }
+
+    .btn-full {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1.05rem;
+    }
+
+    .password-strength {
+        height: 4px;
+        background: var(--glass-border);
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        border-radius: 2px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .password-strength-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+        animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-20px); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateX(20px); opacity: 0; }
+    }
+
+    .password-strength-label {
+        font-size: 0.75rem;
+        margin-top: 0.375rem;
+        text-align: right;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .terms {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        color: var(--gray);
+        font-size: 0.875rem;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+    }
+
+    .terms input {
+        margin-top: 0.25rem;
+        accent-color: var(--primary);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .terms a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        position: relative;
+    }
+
+    .terms a::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--primary);
+        transition: width 0.3s ease;
+    }
+
+    .terms a:hover::after {
+        width: 100%;
+    }
+
+    /* Input focus glow */
+    .input-glow {
+        position: absolute;
+        inset: -2px;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+        filter: blur(8px);
+    }
+
+    .input-wrapper:focus-within .input-glow {
+        opacity: 0.3;
+    }
+
+    /* Password visibility toggle */
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--gray);
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+        padding: 0.25rem;
+    }
+
+    .password-toggle:hover {
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<center>
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card reveal-scale">
+            <div class="auth-header">
+                <div class="logo-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>Create Account</h2>
+                <p>Join EmoVoice to start analyzing emotions</p>
+            </div>
+
+            <form class="auth-form" method="POST" action="{{ url_for('register') }}" id="register-form">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" name="username" class="form-input" placeholder="Choose a username" required minlength="3" autocomplete="username">
+                        <i class="fas fa-user"></i>
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" name="email" class="form-input" placeholder="Enter your email" required autocomplete="email">
+                        <i class="fas fa-envelope"></i>
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" id="password" class="form-input" placeholder="Create a password" required minlength="6" autocomplete="new-password">
+                        <i class="fas fa-lock"></i>
+                        <button type="button" class="password-toggle" id="toggle-password" tabindex="-1">
+                            <i class="fas fa-eye" id="toggle-icon"></i>
+                        </button>
+                        <div class="input-glow"></div>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strength-bar"></div>
+                    </div>
+                    <div class="password-strength-label" id="strength-label"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="confirm_password" id="confirm-password" class="form-input" placeholder="Confirm your password" required autocomplete="new-password">
+                        <i class="fas fa-lock"></i>
+                        <button type="button" class="password-toggle" id="toggle-confirm" tabindex="-1">
+                            <i class="fas fa-eye" id="toggle-confirm-icon"></i>
+                        </button>
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+
+                <label class="terms">
+                    <input type="checkbox" required id="terms-check">
+                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                </label>
+
+                <button type="submit" class="btn btn-primary btn-full btn-glow" id="register-btn">
+                    <i class="fas fa-user-plus"></i>
+                    <span id="btn-text">Create Account</span>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+</center>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm-password');
+    const bar = document.getElementById('strength-bar');
+    const label = document.getElementById('strength-label');
+    const registerForm = document.getElementById('register-form');
+    const registerBtn = document.getElementById('register-btn');
+    const btnText = document.getElementById('btn-text');
+
+    // Password strength meter
+    password.addEventListener('input', function() {
+        const val = this.value;
+        let strength = 0;
+        let labelText = '';
+        let color = '';
+
+        if (val.length >= 6) strength += 25;
+        if (val.length >= 10) strength += 25;
+        if (/[A-Z]/.test(val)) strength += 25;
+        if (/[0-9!@#$%^&*]/.test(val)) strength += 25;
+
+        bar.style.width = strength + '%';
+
+        if (strength <= 25) {
+            color = '#ef4444';
+            labelText = 'Weak';
+        } else if (strength <= 50) {
+            color = '#f59e0b';
+            labelText = 'Fair';
+        } else if (strength <= 75) {
+            color = '#3b82f6';
+            labelText = 'Good';
+        } else {
+            color = '#10b981';
+            labelText = 'Strong';
+        }
+
+        bar.style.background = color;
+        label.textContent = val.length > 0 ? labelText : '';
+        label.style.color = color;
+    });
+
+    // Password visibility toggle
+    function setupToggle(inputId, toggleId, iconId) {
+        const input = document.getElementById(inputId);
+        const toggle = document.getElementById(toggleId);
+        const icon = document.getElementById(iconId);
+
+        toggle.addEventListener('click', function() {
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+        });
+    }
+
+    setupToggle('password', 'toggle-password', 'toggle-icon');
+    setupToggle('confirm-password', 'toggle-confirm', 'toggle-confirm-icon');
+
+    // Form submission
+    registerForm.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+            e.preventDefault();
+            confirmPassword.parentElement.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                confirmPassword.parentElement.style.animation = '';
+            }, 500);
+            return;
+        }
+        btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+        registerBtn.style.opacity = '0.8';
+        registerBtn.style.pointerEvents = 'none';
+    });
+
+    // Input focus effects
+    document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.01)';
+        });
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+
+    // Shake animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

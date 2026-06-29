@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block title %}Features - EmoVoice{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .features-page {
+        padding-top: 2rem;
+    }
+
+    .features-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    .features-header {
+        text-align: center;
+        margin-bottom: 5rem;
+        position: relative;
+    }
+
+    .features-header h1 {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientFlow 5s ease infinite;
+    }
+
+    .features-header p {
+        color: var(--gray);
+        font-size: 1.15rem;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    .feature-showcase {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        margin-bottom: 6rem;
+        position: relative;
+    }
+
+    .feature-showcase.reverse {
+        direction: rtl;
+    }
+
+    .feature-showcase.reverse > * {
+        direction: ltr;
+    }
+
+    .feature-image {
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .feature-image::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0.2;
+        z-index: -1;
+        transition: opacity 0.4s ease;
+    }
+
+    .feature-image:hover::before {
+        opacity: 0.4;
+    }
+
+    .feature-image:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-image i {
+        font-size: clamp(5rem, 8vw, 8rem);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: block;
+        text-align: center;
+        transition: all 0.5s ease;
+    }
+
+    .feature-image:hover i {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .feature-content h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .feature-content p {
+        color: var(--gray);
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+    }
+
+    .feature-list {
+        list-style: none;
+    }
+
+    .feature-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.875rem;
+        color: var(--light);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        padding: 0.25rem 0;
+    }
+
+    .feature-list li:hover {
+        transform: translateX(5px);
+        color: var(--primary);
+    }
+
+    .feature-list li i {
+        color: var(--success);
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .feature-list li:hover i {
+        transform: scale(1.2);
+    }
+
+    .feature-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .feature-card-large {
+        background: var(--glass);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.25rem;
+        padding: 2.5rem;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card-large::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transform: scaleX(0);
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .feature-card-large:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card-large:hover {
+        border-color: rgba(99, 102, 241, 0.2);
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+        background: var(--glass-hover);
+    }
+
+    .feature-card-large .icon-large {
+        width: 60px;
+        height: 60px;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .feature-card-large:hover .icon-large {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    .feature-card-large h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-card-large p {
+        color: var(--gray);
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    /* Decorative line */
+    .section-line {
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 2px;
+        margin: 0 auto 3rem;
+    }
+
+    @media (max-width: 768px) {
+        .feature-showcase {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        .feature-showcase.reverse {
+            direction: ltr;
+        }
+        .feature-image {
+            min-height: 200px;
+            padding: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="features-page">
+    <div class="features-container">
+        <div class="features-header reveal">
+            <h1>Powerful Features</h1>
+            <div class="section-line"></div>
+            <p>Discover everything EmoVoice can do to help you understand emotions through speech</p>
+        </div>
+
+        <div class="feature-showcase reveal">
+            <div class="feature-content">
+                <h2>Real-Time Emotion Detection</h2>
+                <p>Upload any audio file and get instant emotion analysis. Our ANN model processes audio in under 1 second, delivering accurate predictions with confidence scores for all 7 emotion classes.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Instant processing under 1 second</li>
+                    <li><i class="fas fa-check-circle"></i> Support for WAV, MP3, OGG, M4A, FLAC</li>
+                    <li><i class="fas fa-check-circle"></i> Confidence scores for all predictions</li>
+                    <li><i class="fas fa-check-circle"></i> Detailed probability distribution</li>
+                </ul>
+            </div>
+            <div class="feature-image">
+                <i class="fas fa-bolt"></i>
+            </div>
+        </div>
+
+        <div class="feature-showcase reverse reveal">
+            <div class="feature-content">
+                <h2>Advanced Audio Feature Extraction</h2>
+                <p>Our system extracts over 40 acoustic features using Librosa, including MFCCs, chroma features, mel spectrograms, spectral contrast, and temporal features for comprehensive analysis.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> 40 MFCC coefficients</li>
+                    <li><i class="fas fa-check-circle"></i> Chroma energy features</li>
+                    <li><i class="fas fa-check-circle"></i> Mel-frequency spectrogram</li>
+                    <li><i class="fas fa-check-circle"></i> Spectral contrast analysis</li>
+                    <li><i class="fas fa-check-circle"></i> Zero-crossing rate & RMS energy</li>
+                </ul>
+            </div>
+            <div class="feature-image">
+                <i class="fas fa-wave-square"></i>
+            </div>
+        </div>
+
+        <div class="feature-showcase reveal">
+            <div class="feature-content">
+                <h2>Interactive Dashboard</h2>
+                <p>Visualize your emotion analysis results with beautiful, interactive charts. Track your emotional patterns over time with detailed statistics and trend analysis.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Real-time probability charts</li>
+                    <li><i class="fas fa-check-circle"></i> Emotion distribution pie chart</li>
+                    <li><i class="fas fa-check-circle"></i> Historical trend analysis</li>
+                    <li><i class="fas fa-check-circle"></i> Confidence score tracking</li>
+                </ul>
+            </div>
+            <div class="feature-image">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </div>
+
+        <div class="feature-grid-3">
+            <div class="feature-card-large reveal">
+                <div class="icon-large" style="background: rgba(99, 102, 241, 0.15); color: var(--primary);">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>ANN Architecture</h3>
+                <p>Multi-layer neural network with optimized architecture for speech emotion recognition, trained on diverse datasets for robust performance.</p>
+            </div>
+            <div class="feature-card-large reveal">
+                <div class="icon-large" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure & Private</h3>
+                <p>User authentication with encrypted passwords. All audio processing happens locally, ensuring your data remains private and secure.</p>
+            </div>
+            <div class="feature-card-large reveal">
+                <div class="icon-large" style="background: rgba(236, 72, 153, 0.15); color: var(--secondary);">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>Emotion History</h3>
+                <p>Complete history of all your emotion analyses with timestamps, confidence scores, and downloadable reports for personal tracking.</p>
+            </div>
+            <div class="feature-card-large reveal">
+                <div class="icon-large" style="background: rgba(6, 182, 212, 0.15); color: var(--accent);">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Responsive Design</h3>
+                <p>Access your dashboard from any device. Fully responsive interface optimized for desktop, tablet, and mobile experiences.</p>
+            </div>
+            <div class="feature-card-large reveal">
+                <div class="icon-large" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);">
+                    <i class="fas fa-file-audio"></i>
+                </div>
+                <h3>Multiple Formats</h3>
+                <p>Support for all major audio formats including WAV, MP3, OGG, M4A, and FLAC with automatic format detection and conversion.</p>
+            </div>
+            <div class="feature-card-large reveal">
+                <div class="icon-large" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3>High Performance</h3>
+                <p>Optimized processing pipeline with efficient feature extraction and fast inference, handling files up to 16MB with ease.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

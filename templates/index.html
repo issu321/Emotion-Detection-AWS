@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+
+{% block title %}EmoVoice - Speech Emotion Recognition{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* ===== HERO SECTION ===== */
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        max-width: 900px;
+        z-index: 1;
+        position: relative;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.5rem;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        color: var(--accent);
+        margin-bottom: 2.5rem;
+        animation: badgePulse 3s ease-in-out infinite;
+        cursor: default;
+    }
+
+    @keyframes badgePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.3); }
+        50% { box-shadow: 0 0 0 12px rgba(6, 182, 212, 0); }
+    }
+
+    .hero h1 {
+        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #fff 0%, var(--primary) 40%, var(--secondary) 80%);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientFlow 5s ease infinite;
+    }
+
+    @keyframes gradientFlow {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .hero p {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        color: var(--gray);
+        margin-bottom: 2.5rem;
+        line-height: 1.8;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-visual {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.06;
+        pointer-events: none;
+    }
+
+    .hero-visual i {
+        font-size: clamp(12rem, 25vw, 20rem);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: heroIconFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes heroIconFloat {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(3deg); }
+    }
+
+    /* Floating elements */
+    .float-element {
+        position: absolute;
+        border-radius: 1rem;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        padding: 1rem 1.5rem;
+        font-size: 0.85rem;
+        color: var(--gray);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: floatElement 8s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    .float-element i {
+        color: var(--primary);
+    }
+
+    .float-1 { top: 20%; left: 8%; animation-delay: 0s; }
+    .float-2 { top: 30%; right: 10%; animation-delay: -2s; }
+    .float-3 { bottom: 25%; left: 12%; animation-delay: -4s; }
+    .float-4 { bottom: 30%; right: 8%; animation-delay: -6s; }
+
+    @keyframes floatElement {
+        0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+        50% { transform: translateY(-15px) rotate(2deg); opacity: 1; }
+    }
+
+    /* ===== FEATURES SECTION ===== */
+    .features-section {
+        padding: 6rem 2rem;
+        position: relative;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-title h2 {
+        font-size: clamp(2rem, 4vw, 2.75rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .section-title p {
+        color: var(--gray);
+        font-size: 1.125rem;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .feature-card {
+        background: var(--glass);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.25rem;
+        padding: 2.5rem;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        transform: scaleX(0);
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-12px);
+        border-color: rgba(99, 102, 241, 0.2);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.1);
+        background: var(--glass-hover);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(-5deg);
+        box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+    }
+
+    .feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-card p {
+        color: var(--gray);
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    /* ===== STATS SECTION ===== */
+    .stats-section {
+        padding: 6rem 2rem;
+        position: relative;
+    }
+
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.03), transparent);
+        pointer-events: none;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 2.5rem 2rem;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.25rem;
+        transition: all 0.4s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-8px);
+        border-color: rgba(99, 102, 241, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-number {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .stat-label {
+        color: var(--gray);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    /* ===== CTA SECTION ===== */
+    .cta-section {
+        padding: 6rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .cta-card {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 4rem 3rem;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.08));
+        border: 1px solid var(--glass-border);
+        border-radius: 2rem;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+    }
+
+    .cta-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+        animation: rotate 25s linear infinite;
+    }
+
+    .cta-card::after {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 2rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: -1;
+        filter: blur(15px);
+    }
+
+    .cta-card:hover::after {
+        opacity: 0.3;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .cta-card h2 {
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        position: relative;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .cta-card p {
+        color: var(--gray);
+        margin-bottom: 2rem;
+        position: relative;
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+    /* ===== MARQUEE ===== */
+    .marquee-section {
+        padding: 3rem 0;
+        overflow: hidden;
+        border-top: 1px solid var(--glass-border);
+        border-bottom: 1px solid var(--glass-border);
+        background: rgba(15, 23, 42, 0.3);
+    }
+
+    .marquee-track {
+        display: flex;
+        gap: 3rem;
+        animation: marquee 30s linear infinite;
+        width: max-content;
+    }
+
+    .marquee-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--gray);
+        font-size: 0.9rem;
+        white-space: nowrap;
+        opacity: 0.6;
+    }
+
+    .marquee-item i {
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .features-grid { grid-template-columns: 1fr; }
+        .float-element { display: none; }
+        .hero { min-height: 80vh; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<center>
+<section class="hero">
+    <div class="hero-visual">
+        <i class="fas fa-microphone-alt"></i>
+    </div>
+    <div class="float-element float-1">
+        <i class="fas fa-brain"></i> ANN Powered
+    </div>
+    <div class="float-element float-2">
+        <i class="fas fa-bolt"></i> Real-Time
+    </div>
+    <div class="float-element float-3">
+        <i class="fas fa-shield-alt"></i> Secure
+    </div>
+    <div class="float-element float-4">
+        <i class="fas fa-chart-line"></i> Analytics
+    </div>
+    <div class="hero-content">
+        <div class="hero-badge reveal-scale">
+            <i class="fas fa-bolt"></i>
+            Powered by Artificial Neural Networks
+        </div>
+        <h1 class="reveal">Understand Emotions<br>Through Voice</h1>
+        <p class="reveal">Advanced speech emotion recognition system that analyzes vocal patterns using deep learning. Detect emotions in real-time with our ANN-powered dashboard.</p>
+        <div class="hero-buttons reveal">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-glow">
+                <i class="fas fa-rocket"></i>
+                Get Started
+            </a>
+            <a href="{{ url_for('about') }}" class="btn btn-secondary">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Marquee -->
+<div class="marquee-section">
+    <div class="marquee-track">
+        <div class="marquee-item"><i class="fas fa-check"></i> 7 Emotion Classes</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> 40+ Audio Features</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> &lt;1s Processing</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> 95% Accuracy Target</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Real-Time Analysis</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Secure & Private</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Multi-Format Support</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Interactive Dashboard</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> 7 Emotion Classes</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> 40+ Audio Features</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> &lt;1s Processing</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> 95% Accuracy Target</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Real-Time Analysis</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Secure & Private</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Multi-Format Support</div>
+        <div class="marquee-item"><i class="fas fa-check"></i> Interactive Dashboard</div>
+    </div>
+</div>
+
+<div class="section-divider"></div>
+
+<section class="features-section">
+    <div class="section-title reveal">
+        <h2>Key Features</h2>
+        <p>Everything you need for comprehensive emotion analysis</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3>ANN Classification</h3>
+            <p>State-of-the-art Artificial Neural Network trained on diverse emotional speech datasets for accurate classification across 7 emotion categories.</p>
+        </div>
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Real-Time Dashboard</h3>
+            <p>Interactive visualization dashboard with live emotion tracking, confidence metrics, and historical analysis charts.</p>
+        </div>
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <i class="fas fa-wave-square"></i>
+            </div>
+            <h3>Audio Feature Extraction</h3>
+            <p>Advanced signal processing with MFCC, chroma, mel spectrogram, spectral contrast, and zero-crossing rate features.</p>
+        </div>
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3>Emotion History</h3>
+            <p>Track your emotional journey over time with detailed history logs, trend analysis, and personalized insights.</p>
+        </div>
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Secure & Private</h3>
+            <p>User authentication system with encrypted passwords. Your audio data is processed securely and never shared.</p>
+        </div>
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Fast Processing</h3>
+            <p>Optimized audio processing pipeline delivers emotion predictions in milliseconds with high accuracy.</p>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<section class="stats-section">
+    <div class="section-title reveal">
+        <h2>System Capabilities</h2>
+        <p>Built for performance and accuracy</p>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-item reveal-scale">
+            <div class="stat-number" data-count="7">0</div>
+            <div class="stat-label">Emotion Classes</div>
+        </div>
+        <div class="stat-item reveal-scale">
+            <div class="stat-number" data-count="40">0</div>
+            <div class="stat-label">Audio Features</div>
+        </div>
+        <div class="stat-item reveal-scale">
+            <div class="stat-number">&lt;1s</div>
+            <div class="stat-label">Processing Time</div>
+        </div>
+        <div class="stat-item reveal-scale">
+            <div class="stat-number" data-count="95">0</div>
+            <div class="stat-label">% Accuracy Target</div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<section class="cta-section">
+    <div class="cta-card reveal-scale">
+        <h2>Ready to Analyze Emotions?</h2>
+        <p>Join thousands of users who are already understanding emotions through voice analysis. Create your free account and start exploring today.</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-glow">
+            <i class="fas fa-user-plus"></i>
+            Create Free Account
+        </a>
+    </div>
+</section>
+</center>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Counter animation
+    function animateCounters() {
+        const counters = document.querySelectorAll('[data-count]');
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-count'));
+            const duration = 2000;
+            const step = target / (duration / 16);
+            let current = 0;
+            const update = () => {
+                current += step;
+                if (current < target) {
+                    counter.textContent = Math.floor(current) + (counter.textContent.includes('%') ? '%' : '+');
+                    requestAnimationFrame(update);
+                } else {
+                    counter.textContent = target + (counter.textContent.includes('%') ? '%' : '+');
+                }
+            };
+            update();
+        });
+    }
+
+    // Trigger counter animation when stats section is visible
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounters();
+                statsObserver.disconnect();
+            }
+        });
+    }, { threshold: 0.3 });
+
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) statsObserver.observe(statsSection);
+</script>
+{% endblock %}
